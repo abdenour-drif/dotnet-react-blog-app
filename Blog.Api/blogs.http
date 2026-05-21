@@ -1,0 +1,41 @@
+GET http://localhost:5270/blogs
+###
+GET http://localhost:5270/blogs/second-blog-post
+###
+POST http://localhost:5270/blogs
+Content-Type: application/json
+
+{
+  "title": "New Blog Post",
+  "subtitle": "This is a new blog post.",
+  "intro": "This is the intro of the new blog post.",
+  "content": "This is the content of the new blog post.",
+  "summary": "This is the summary of the new blog post.",
+  "tags": ["new", "blog", "post"],
+  "contributors": [
+    { "contributorId": 1, "role": "Author" },
+    { "contributorId": 2, "role": "Editor" }
+  ]
+}
+
+###
+PATCH http://localhost:5270/blogs/first-blog-post
+Content-Type: application/json
+
+{
+  "title": "Updated First Blog Post",
+  "subtitle": "This is the updated first blog post."
+}
+
+###
+PATCH http://localhost:5270/blogs/first-blog-post
+Content-Type: application/json
+
+{
+  "contributors": [
+    { "contributorId": 2, "role": "Author" }
+  ]
+}
+
+### 
+DELETE http://localhost:5270/blogs/1
