@@ -38,6 +38,8 @@ ScaffoldingReadMe.txt
 
 # dotenv environment variables file
 .env
+.env.*
+!.env.example
 
 # IDE settings
 .vs/
@@ -54,6 +56,15 @@ ScaffoldingReadMe.txt
 *.sqlite-shm
 *.sqlite-wal
 *.sqlite3
+
+# React / Vite frontend
+Blog.React/node_modules/
+Blog.React/dist/
+Blog.React/.vite/
+Blog.React/.vite-temp/
+Blog.React/.env
+Blog.React/.env.*
+!Blog.React/.env.example
 
 # Others
 ~$*

@@ -1,6 +1,6 @@
 GET http://localhost:5270/blogs
 ###
-GET http://localhost:5270/blogs/second-blog-post
+GET http://localhost:5270/blogs/new-blog-post
 ###
 POST http://localhost:5270/blogs
 Content-Type: application/json
@@ -14,12 +14,20 @@ Content-Type: application/json
   "tags": ["new", "blog", "post"],
   "contributors": [
     { "contributorId": 1, "role": "Author" },
-    { "contributorId": 2, "role": "Editor" }
+    { "contributorId": 3, "role": "Editor" }
   ]
 }
 
 ###
-PATCH http://localhost:5270/blogs/first-blog-post
+POST http://localhost:5270/blogs/new-blog-post/contributors
+Content-Type: application/json
+
+
+{ 
+  "contributorId": 3, "role": "Author" 
+}
+###
+PATCH http://localhost:5270/blogs/new-blog-post
 Content-Type: application/json
 
 {
@@ -28,14 +36,14 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:5270/blogs/first-blog-post
+PATCH http://localhost:5270/blogs/new-blog-post/contributors/1?role=Editor
 Content-Type: application/json
 
 {
   "contributors": [
-    { "contributorId": 2, "role": "Author" }
+    { "contributorId": 3, "role": "Editor" }
   ]
 }
 
 ### 
-DELETE http://localhost:5270/blogs/1
+DELETE http://localhost:5270/blogs/new-blog-post/contributors/1

@@ -1,0 +1,51 @@
+GET http://localhost:5270/contributors
+###
+GET http://localhost:5270/contributors/1
+
+###
+GET http://localhost:5270/contributors/1/blogs
+
+###
+POST http://localhost:5270/contributors
+Content-Type: application/json
+
+{
+  "DisplayName": "Susane Margarete Johnson Smith",
+  "FirstName": "Susane",
+  "MiddleNames": ["Margarete", "Johnson"],
+  "LastName": "Smith",
+  "Email": "susane.smith@example.com",
+  "Bio": "This is the bio of Susane Smith.",
+  "AvatarUrl": "https://example.com/susane/avatar.jpg"
+}
+###
+POST http://localhost:5270/contributors
+Content-Type: application/json
+
+{
+  "DisplayName": "John Doe",
+  "FirstName": "John",
+  "MiddleNames": ["Doe"],
+  "LastName": "Smith",
+  "Email": "john.doe@example.com",
+  "Bio": "This is the bio of John Doe.",
+  "AvatarUrl": "https://example.com/john/avatar.jpg"
+}
+###
+PATCH http://localhost:5270/contributors/1
+Content-Type: application/json
+
+{
+  "Bio": "Updated My new Bio",
+}
+
+###
+PATCH http://localhost:5270/contributors/1
+Content-Type: application/json
+
+{
+  "DisplayName": "John Doe Updated",
+}
+
+### 
+DELETE http://localhost:5270/contributors/2

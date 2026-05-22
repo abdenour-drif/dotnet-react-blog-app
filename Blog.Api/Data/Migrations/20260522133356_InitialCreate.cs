@@ -35,22 +35,47 @@ namespace Blog.Api.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Contributors",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
                     DisplayName = table.Column<string>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     MiddleNames = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
                     Bio = table.Column<string>(type: "TEXT", nullable: true),
-                    AvatarUrl = table.Column<string>(type: "TEXT", nullable: true)
+                    AvatarUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Contributors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Contributors_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -89,6 +114,12 @@ namespace Blog.Api.Data.Migrations
                 name: "IX_BlogContributors_ContributorId",
                 table: "BlogContributors",
                 column: "ContributorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contributors_UserId",
+                table: "Contributors",
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -102,6 +133,9 @@ namespace Blog.Api.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Contributors");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

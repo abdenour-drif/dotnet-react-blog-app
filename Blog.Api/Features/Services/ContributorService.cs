@@ -1,4 +1,5 @@
 using Blog.Api.Data;
+using Blog.Api.Dtos.Blogs;
 using Blog.Api.Dtos.Contributors;
 using Blog.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,19 @@ public class ContributorService(BlogStoreContext dbContext) : IContributorServic
       .FirstOrDefaultAsync(ct);
   }
 
+  public async Task<IReadOnlyList<ContributorBlogSummaryDto>> GetContributorBlogsAsync(int id, int take = 10, CancellationToken ct = default)
+  {
+    return await dbContext.BlogContributors
+      .Where(bc => bc.ContributorId == id)
+      .OrderByDescending(bc => bc.Blog.Id)
+      .Take(take)
+      .Select(bc => new ContributorBlogSummaryDto(
+        bc.Blog.Slug,
+        bc.Blog.Title,
+        bc.Role
+      ))
+      .ToListAsync(ct);
+  }
   public async Task<BlogContributorDto> CreateAsync(CreateContributorDto newContributor, CancellationToken ct = default)
   {
     ContributorModel contributor = new()
@@ -83,14 +97,14 @@ public class ContributorService(BlogStoreContext dbContext) : IContributorServic
   public async Task<BlogContributorDto?> UpdateAsync(int id, UpdateContributorDto updatedContributor, CancellationToken ct = default)
   {
     var contributor = await dbContext.Contributors.FindAsync([id], ct);
-    if (contributor is null) 
+    if (contributor is null)
       return null;
 
     contributor.DisplayName = updatedContributor.DisplayName;
     contributor.Email = updatedContributor.Email;
     contributor.FirstName = updatedContributor.FirstName ?? contributor.FirstName;
     contributor.MiddleNames = updatedContributor.MiddleNames?.ToString() ?? contributor.MiddleNames;
-    contributor.LastName = updatedContributor.LastName ?? contributor.LastName; 
+    contributor.LastName = updatedContributor.LastName ?? contributor.LastName;
     contributor.AvatarUrl = updatedContributor.AvatarUrl;
     contributor.Bio = updatedContributor.Bio;
     contributor.UpdatedAt = DateTimeOffset.UtcNow;
@@ -114,16 +128,11 @@ public class ContributorService(BlogStoreContext dbContext) : IContributorServic
   public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
   {
     var contributor = await dbContext.Contributors.FindAsync([id], ct);
-    if (contributor is null) 
+    if (contributor is null)
       return false;
 
     dbContext.Contributors.Remove(contributor);
     await dbContext.SaveChangesAsync(ct);
-      return true;
-  }
-
-  Task<bool> IContributorService.DeleteAsync(int id, CancellationToken ct)
-  {
-    throw new NotImplementedException();
+    return true;
   }
 }

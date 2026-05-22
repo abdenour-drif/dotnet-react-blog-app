@@ -5,6 +5,8 @@ namespace Blog.Api.Models;
 public class Contributor
 {
   public int Id { get; set; }
+  public int UserId { get; set; }
+  public User User { get; set; } = null!;
   public required string DisplayName { get; set; }
   public required string Email { get; set; }
   public required string FirstName { get; set; }

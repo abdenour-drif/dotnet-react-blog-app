@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Blog.Api/Dockerfile
+    working_dir: /app
+    environment:
+      ConnectionStrings__BlogStore: "Data Source=/data/BlogStore.db"
+    volumes:
+      - ./Blog.Api:/app
+      - sqlite_data:/data
+      - aspnet_keys:/root/.aspnet/DataProtection-Keys
+    ports:
+      - "5270:5270"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Blog.React/Dockerfile
+    working_dir: /app
+    environment:
+      - VITE_PROXY_TARGET=${VITE_PROXY_TARGET}
+      - VITE_PORT=${VITE_PORT}
+    volumes:
+      - ./Blog.React:/app
+      - /app/node_modules
+    ports:
+      - "${VITE_PORT}:5173"
+    depends_on:
+      - backend
+
+volumes:
+  sqlite_data:
+  aspnet_keys:

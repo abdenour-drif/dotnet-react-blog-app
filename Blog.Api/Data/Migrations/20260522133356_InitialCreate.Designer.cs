@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Api.Data.Migrations
 {
     [DbContext(typeof(BlogStoreContext))]
-    [Migration("20260521164301_InitialCreate")]
+    [Migration("20260522133356_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -107,6 +107,9 @@ namespace Blog.Api.Data.Migrations
                     b.Property<string>("Bio")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -123,13 +126,47 @@ namespace Blog.Api.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.PrimitiveCollection<string>("MiddleNames")
+                    b.Property<string>("MiddleNames")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Contributors");
+                });
+
+            modelBuilder.Entity("Blog.Api.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contributors");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Blog.Api.Models.BlogContributor", b =>
@@ -151,9 +188,26 @@ namespace Blog.Api.Data.Migrations
                     b.Navigation("Contributor");
                 });
 
+            modelBuilder.Entity("Blog.Api.Models.Contributor", b =>
+                {
+                    b.HasOne("Blog.Api.Models.User", "User")
+                        .WithOne("Contributor")
+                        .HasForeignKey("Blog.Api.Models.Contributor", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Blog.Api.Models.Blog", b =>
                 {
                     b.Navigation("Contributors");
+                });
+
+            modelBuilder.Entity("Blog.Api.Models.User", b =>
+                {
+                    b.Navigation("Contributor")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

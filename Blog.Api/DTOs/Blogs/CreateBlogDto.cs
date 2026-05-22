@@ -9,6 +9,5 @@ public record CreateBlogDto(
     [Required] string Content,
     [StringLength(1000)] string Summary,
     [Url] string? CoverImageUrl,
-    IReadOnlyList<BlogContributorAssignmentDto> Contributors,
     IReadOnlyList<string> Tags
 );
