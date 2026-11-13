@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navbar } from './components/Navbar'
 import { StatusBanner } from './components/StatusBanner'
 import { demoAccounts } from './constants/demoAccounts'
@@ -377,20 +377,6 @@ function App() {
   function clearMessages() {
     setStatusMessage('')
     setErrorMessage('')
-  }
-
-  function handleError(error: unknown, fallback: string) {
-    if (error instanceof ApiError) {
-      setErrorMessage(error.message || fallback)
-      return
-    }
-
-    if (error instanceof Error) {
-      setErrorMessage(error.message || fallback)
-      return
-    }
-
-    setErrorMessage(fallback)
   }
 
   return (
