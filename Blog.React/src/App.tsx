@@ -76,38 +76,21 @@ function App() {
   const canManageContributors = currentBlogRole === 'Author'
   const canDeleteSelectedBlog = currentBlogRole === 'Author'
 
-  useEffect(() => {
-    void bootstrap()
-  }, [])
-
-  useEffect(() => {
-    const onHashChange = () => setRoute(parseHashRoute())
-    window.addEventListener('hashchange', onHashChange)
-    return () => window.removeEventListener('hashchange', onHashChange)
-  }, [])
-
-  useEffect(() => {
-    if (route.kind === 'blog') {
-      void fetchBlog(route.slug)
+  const handleError = useCallback((error: unknown, fallback: string) => {
+    if (error instanceof ApiError) {
+      setErrorMessage(error.message || fallback)
       return
     }
 
-    setSelectedBlog(null)
-  }, [route])
-
-  async function bootstrap() {
-    setBusy('bootstrap')
-    try {
-      await Promise.all([refreshSession(), refreshBlogs(), refreshContributors()])
-      setStatusMessage('Backend connected')
-    } catch (error) {
-      handleError(error, 'Failed to load initial data.')
-    } finally {
-      setBusy(null)
+    if (error instanceof Error) {
+      setErrorMessage(error.message || fallback)
+      return
     }
-  }
 
-  async function refreshSession() {
+    setErrorMessage(fallback)
+  }, [])
+
+  const refreshSession = useCallback(async () => {
     try {
       const user = await api<AuthMe>('/auth/me')
       setCurrentUser(user)
@@ -119,23 +102,24 @@ function App() {
 
       throw error
     }
-  }
+  }, [])
 
-  async function refreshBlogs() {
+  const refreshBlogs = useCallback(async () => {
     const data = await api<Blog[]>('/blogs')
     setBlogs(data)
 
-    if (route.kind === 'blog' && !data.some((blog) => blog.slug === route.slug)) {
+    const currentRoute = parseHashRoute()
+    if (currentRoute.kind === 'blog' && !data.some((blog) => blog.slug === currentRoute.slug)) {
       navigateTo({ kind: 'home' })
     }
-  }
+  }, [])
 
-  async function refreshContributors() {
+  const refreshContributors = useCallback(async () => {
     const data = await api<Contributor[]>('/contributors')
     setContributors(data)
-  }
+  }, [])
 
-  async function fetchBlog(slug: string) {
+  const fetchBlog = useCallback(async (slug: string) => {
     try {
       const data = await api<Blog>(`/blogs/${slug}`)
       setSelectedBlog(data)
@@ -156,7 +140,39 @@ function App() {
     } catch (error) {
       handleError(error, 'Failed to load blog detail.')
     }
-  }
+  }, [handleError])
+
+  const bootstrap = useCallback(async () => {
+    setBusy('bootstrap')
+    try {
+      await Promise.all([refreshSession(), refreshBlogs(), refreshContributors()])
+      setStatusMessage('Backend connected')
+    } catch (error) {
+      handleError(error, 'Failed to load initial data.')
+    } finally {
+      setBusy(null)
+    }
+  }, [refreshSession, refreshBlogs, refreshContributors, handleError])
+
+  useEffect(() => {
+    void bootstrap()
+  }, [bootstrap])
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setSelectedBlog(null)
+      setRoute(parseHashRoute())
+    }
+
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  useEffect(() => {
+    if (route.kind === 'blog') {
+      void fetchBlog(route.slug)
+    }
+  }, [route, fetchBlog])
 
   async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
