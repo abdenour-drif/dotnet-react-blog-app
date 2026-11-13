@@ -155,8 +155,18 @@ function App() {
   }, [refreshSession, refreshBlogs, refreshContributors, handleError])
 
   useEffect(() => {
-    void bootstrap()
-  }, [bootstrap])
+  let cancelled = false
+
+  void Promise.resolve().then(() => {
+    if (!cancelled) {
+      return bootstrap()
+    }
+  })
+
+  return () => {
+    cancelled = true
+  }
+}, [bootstrap])
 
   useEffect(() => {
     const onHashChange = () => {
@@ -168,11 +178,21 @@ function App() {
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
-  useEffect(() => {
-    if (route.kind === 'blog') {
-      void fetchBlog(route.slug)
+ useEffect(() => {
+  if (route.kind !== 'blog') return
+
+  let cancelled = false
+
+  void Promise.resolve().then(() => {
+    if (!cancelled) {
+      return fetchBlog(route.slug)
     }
-  }, [route, fetchBlog])
+  })
+
+  return () => {
+    cancelled = true
+  }
+}, [route, fetchBlog])
 
   async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
